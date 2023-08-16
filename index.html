@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ca6dfd;
+    }
+    #calculator {
+      width: 300px;
+      margin: 50px auto;
+      background-color: #f1c40f;
+      border: 1px solid #ccc;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      text-align: center;
+    }
+    #result {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    #history {
+      margin-top: 20px;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+      text-align: left;
+    }
+    .btn-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+    .btn {
+      width: 60px;
+      height: 60px;
+      font-size: 20px;
+      color: #fff;
+      background-color: #e74c3c;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <div id="calculator" tabindex="0">
+    <div id="result"></div>
+    <div class="btn-container">
+      <button class="btn" onclick="appendValue('7')">7</button>
+      <button class="btn" onclick="appendValue('8')">8</button>
+      <button class="btn" onclick="appendValue('9')">9</button>
+      <button class="btn" onclick="appendValue('+')">+</button>
+      <button class="btn" onclick="appendValue('4')">4</button>
+      <button class="btn" onclick="appendValue('5')">5</button>
+      <button class="btn" onclick="appendValue('6')">6</button>
+      <button class="btn" onclick="appendValue('-')">-</button>
+      <button class="btn" onclick="appendValue('1')">1</button>
+      <button class="btn" onclick="appendValue('2')">2</button>
+      <button class="btn" onclick="appendValue('3')">3</button>
+      <button class="btn" onclick="appendValue('*')">*</button>
+      <button class="btn" onclick="appendValue('0')">0</button>
+      <button class="btn" onclick="appendValue('.')">.</button>
+      <button class="btn" onclick="calculate()">=</button>
+      <button class="btn" onclick="clearInput()">C</button>
+      <button class="btn" onclick="appendValue('/')">/</button>
+    </div>
+    <div id="history"></div>
+  </div>
+
+  <script>
+    let inputValue = '';
+    let history = [];
+
+    function appendValue(value) {
+      inputValue += value;
+      document.getElementById('result').innerText = inputValue;
+    }
+
+    function calculate() {
+      try {
+        const result = eval(inputValue);
+        history.push({ expression: inputValue, result });
+        inputValue = result.toString();
+        document.getElementById('result').innerText = inputValue;
+        updateHistory();
+      } catch (error) {
+        document.getElementById('result').innerText = 'Error';
+      }
+    }
+
+    function clearInput() {
+      inputValue = '';
+      document.getElementById('result').innerText = '';
+    }
+
+    function updateHistory() {
+      const historyElement = document.getElementById('history');
+      historyElement.innerHTML = '';
+      history.forEach(entry => {
+        const entryDiv = document.createElement('div');
+        entryDiv.textContent = `${entry.expression} = ${entry.result}`;
+        historyElement.appendChild(entryDiv);
+      });
+    }
+
+    function moveCursor(direction) {
+      const resultElement = document.getElementById('result');
+      const cursorPosition = window.getSelection().focusOffset;
+
+      if (direction === 'left') {
+        if (cursorPosition > 0) {
+          resultElement.focus();
+          const range = document.createRange();
+          range.setStart(resultElement.firstChild, cursorPosition - 1);
+          range.collapse(true);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      } else if (direction === 'right') {
+        if (cursorPosition < resultElement.innerText.length) {
+          resultElement.focus();
+          const range = document.createRange();
+          range.setStart(resultElement.firstChild, cursorPosition + 1);
+          range.collapse(true);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+    }
+
+    document.addEventListener('keydown', function(event) {
+      const key = event.key;
+      if (/[0-9+\-*/=.C]/.test(key) || key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown') {
+        event.preventDefault(); 
+        if (key === 'Enter') {
+          calculate();
+        } else if (key === 'c' || key === 'C') {
+          clearInput();
+        } else if (key === 'ArrowLeft') {
+          moveCursor('left');
+        } else if (key === 'ArrowRight') {
+          moveCursor('right');
+        }else {
+          appendValue(key);
+        }
+      }
+    });
+
+    document.getElementById('calculator').focus();
+  </script>
+</body>
+</html>
