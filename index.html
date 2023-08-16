@@ -45,6 +45,9 @@
     .btn:hover {
       background-color: #c0392b;
     }
+    #backspace {
+      background-color: #34495e;
+    }
   </style>
 </head>
 <body>
@@ -68,6 +71,7 @@
       <button class="btn" onclick="appendValue('.')">.</button>
       <button class="btn" onclick="calculate()">=</button>
       <button class="btn" onclick="clearInput()">C</button>
+      <button class="btn" id="backspace" onclick="backspace()">←</button>
       <button class="btn" onclick="appendValue('/')">/</button>
       <button class="btn" onclick="appendValue('%')">%</button>
     </div>
@@ -99,6 +103,11 @@
     function clearInput() {
       inputValue = '';
       document.getElementById('result').innerText = '';
+    }
+
+    function backspace() {
+      inputValue = inputValue.slice(0, -1);
+      document.getElementById('result').innerText = inputValue;
     }
 
     function updateHistory() {
@@ -140,7 +149,7 @@
 
     document.addEventListener('keydown', function(event) {
       const key = event.key;
-      if (/[0-9+\-*/=.C%]/.test(key) || key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown') {
+      if (/[0-9+\-*/=.C%]/.test(key) || key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown' || key === 'Backspace') {
         event.preventDefault();
         if (key === 'Enter') {
           calculate();
@@ -150,6 +159,8 @@
           moveCursor('left');
         } else if (key === 'ArrowRight') {
           moveCursor('right');
+        } else if (key === 'Backspace') {
+          backspace();
         } else {
           appendValue(key);
         }
